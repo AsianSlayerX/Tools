@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citation Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 700px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .format-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .format-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .format-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .format-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: 'Georgia', serif;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .date-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .helper-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .citation-output {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .citation-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .citation-text {
+            font-family: 'Times New Roman', serif;
+            line-height: 2;
+            color: #333;
+            font-size: 14px;
+            word-wrap: break-word;
+            text-indent: -2em;
+            padding-left: 2em;
+        }
+        
+        .copy-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+        
+        .success-msg {
+            display: none;
+            color: #4caf50;
+            font-size: 12px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Website Citation Generator</h1>
+        <p class="subtitle">Fill in the information below to generate your citation</p>
+        
+        <div class="format-toggle">
+            <button class="format-btn active" onclick="setFormat('apa')">APA 7th Edition</button>
+            <button class="format-btn" onclick="setFormat('mla')">MLA 9th Edition</button>
+        </div>
+        
+        <div class="input-group">
+            <label for="authorLast">Author Last Name</label>
+            <input type="text" id="authorLast" placeholder="Last Name" oninput="generateCitation()">
+            <div class="helper-text">Leave blank if no author</div>
+        </div>
+        
+        <div class="input-group">
+            <label for="authorFirst">Author First Name</label>
+            <input type="text" id="authorFirst" placeholder="First Name" oninput="generateCitation()">
+        </div>
+        
+        <div class="input-group">
+            <label>Publication Date</label>
+            <div class="date-group">
+                <input type="text" id="year" placeholder="Year" oninput="generateCitation()">
+                <input type="text" id="month" placeholder="Month" oninput="generateCitation()">
+                <input type="text" id="day" placeholder="Day" oninput="generateCitation()">
+            </div>
+            <div class="helper-text">Leave blank if no date available (will use "n.d.")</div>
+        </div>
+        
+        <div class="input-group">
+            <label for="title">Title of Webpage</label>
+            <input type="text" id="title" placeholder="Enter the webpage title here" oninput="generateCitation()">
+        </div>
+        
+        <div class="input-group">
+            <label for="website">Website Name</label>
+            <input type="text" id="website" placeholder="Name of the website" oninput="generateCitation()">
+            <div class="helper-text">Leave blank if same as author</div>
+        </div>
+        
+        <div class="input-group">
+            <label for="url">URL</label>
+            <input type="text" id="url" placeholder="https://www.websiteurl.com" oninput="generateCitation()">
+        </div>
+        
+        <div class="input-group" id="accessDateGroup" style="display: none;">
+            <label>Access Date (MLA only)</label>
+            <div class="date-group">
+                <input type="text" id="accessYear" placeholder="Year" oninput="generateCitation()">
+                <input type="text" id="accessMonth" placeholder="Month" oninput="generateCitation()">
+                <input type="text" id="accessDay" placeholder="Day" oninput="generateCitation()">
+            </div>
+        </div>
+        
+        <div class="citation-output">
+            <div class="citation-label" id="formatLabel">APA 7th Edition Citation</div>
+            <div class="citation-text" id="citationText">Fill in the fields above to generate your citation</div>
+            <button class="copy-btn" onclick="copyCitation()">Copy Citation</button>
+            <div class="success-msg" id="successMsg">✓ Copied to clipboard!</div>
+        </div>
+    </div>
+
+    <script>
+        let currentFormat = 'apa';
+        
+        function setFormat(format) {
+            currentFormat = format;
+            document.querySelectorAll('.format-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (format === 'mla') {
+                document.getElementById('accessDateGroup').style.display = 'block';
+                document.getElementById('formatLabel').textContent = 'MLA 9th Edition Citation';
+            } else {
+                document.getElementById('accessDateGroup').style.display = 'none';
+                document.getElementById('formatLabel').textContent = 'APA 7th Edition Citation';
+            }
+            
+            generateCitation();
+        }
+        
+        function generateCitation() {
+            const authorLast = document.getElementById('authorLast').value.trim();
+            const authorFirst = document.getElementById('authorFirst').value.trim();
+            const year = document.getElementById('year').value.trim();
+            const month = document.getElementById('month').value.trim();
+            const day = document.getElementById('day').value.trim();
+            const title = document.getElementById('title').value.trim();
+            const website = document.getElementById('website').value.trim();
+            const url = document.getElementById('url').value.trim();
+            
+            if (!title) {
+                document.getElementById('citationText').textContent = 'Fill in the fields above to generate your citation';
+                return;
+            }
+            
+            let citation = '';
+            
+            if (currentFormat === 'apa') {
+                citation = generateAPA(authorLast, authorFirst, year, month, day, title, website, url);
+            } else {
+                const accessYear = document.getElementById('accessYear').value.trim();
+                const accessMonth = document.getElementById('accessMonth').value.trim();
+                const accessDay = document.getElementById('accessDay').value.trim();
+                citation = generateMLA(authorLast, authorFirst, year, month, day, title, website, url, accessYear, accessMonth, accessDay);
+            }
+            
+            document.getElementById('citationText').textContent = citation;
+        }
+        
+        function generateAPA(authorLast, authorFirst, year, month, day, title, website, url) {
+            let citation = '';
+            
+            // Author
+            if (authorLast) {
+                citation += authorLast;
+                if (authorFirst) {
+                    citation += ', ' + authorFirst.charAt(0) + '.';
+                }
+                citation += ' ';
+            }
+            
+            // Date
+            citation += '(';
+            if (year) {
+                citation += year;
+                if (month) {
+                    citation += ', ' + month;
+                    if (day) {
+                        citation += ' ' + day;
+                    }
+                }
+            } else {
+                citation += 'n.d.';
+            }
+            citation += '). ';
+            
+            // Title (italicized in display)
+            citation += title.charAt(0).toUpperCase() + title.slice(1).toLowerCase() + '. ';
+            
+            // Website name
+            if (website && website !== authorLast) {
+                citation += website + '. ';
+            }
+            
+            // URL
+            if (url) {
+                citation += url;
+            }
+            
+            return citation;
+        }
+        
+        function generateMLA(authorLast, authorFirst, year, month, day, title, website, url, accessYear, accessMonth, accessDay) {
+            let citation = '';
+            
+            // Author
+            if (authorLast) {
+                citation += authorLast;
+                if (authorFirst) {
+                    citation += ', ' + authorFirst;
+                }
+                citation += '. ';
+            }
+            
+            // Title (in quotes)
+            citation += '"' + title.charAt(0).toUpperCase() + title.slice(1) + '." ';
+            
+            // Website name (italicized)
+            if (website) {
+                citation += website + ', ';
+            }
+            
+            // Date
+            if (day && month && year) {
+                citation += day + ' ' + month + ' ' + year + ', ';
+            } else if (month && year) {
+                citation += month + ' ' + year + ', ';
+            } else if (year) {
+                citation += year + ', ';
+            }
+            
+            // URL
+            if (url) {
+                citation += url + '. ';
+            }
+            
+            // Access date
+            if (accessDay && accessMonth && accessYear) {
+                citation += 'Accessed ' + accessDay + ' ' + accessMonth + ' ' + accessYear + '.';
+            }
+            
+            return citation;
+        }
+        
+        function copyCitation() {
+            const citationText = document.getElementById('citationText').textContent;
+            navigator.clipboard.writeText(citationText).then(() => {
+                const successMsg = document.getElementById('successMsg');
+                successMsg.style.display = 'block';
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
