@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citation Machine</title>
+    <title>Citation Generator</title>
     <style>
         * {
             margin: 0;
@@ -83,7 +83,7 @@
             font-size: 14px;
         }
         
-        input {
+        input, select {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -93,9 +93,75 @@
             font-family: 'Georgia', serif;
         }
         
-        input:focus {
+        select {
+            cursor: pointer;
+            background: white;
+        }
+        
+        input:focus, select:focus {
             outline: none;
             border-color: #667eea;
+        }
+        
+        .author-section {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #fafafa;
+        }
+        
+        .author-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .author-number {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .remove-author-btn {
+            padding: 6px 12px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .remove-author-btn:hover {
+            background: #ee5a6f;
+        }
+        
+        .author-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .add-author-btn {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            color: #667eea;
+            border: 2px dashed #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .add-author-btn:hover {
+            background: #f0f4ff;
+            border-style: solid;
         }
         
         .date-group {
@@ -135,13 +201,47 @@
             word-wrap: break-word;
             text-indent: -2em;
             padding-left: 2em;
+            margin-bottom: 15px;
         }
         
-        .copy-btn {
+        .intext-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        
+        .intext-label {
+            font-size: 11px;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .intext-examples {
+            background: white;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Times New Roman', serif;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.8;
+        }
+        
+        .intext-example {
+            margin-bottom: 6px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
             margin-top: 15px;
+        }
+        
+        .copy-btn, .new-citation-btn {
+            flex: 1;
             padding: 10px 20px;
-            background: #667eea;
-            color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -150,12 +250,28 @@
             transition: all 0.3s;
         }
         
+        .copy-btn {
+            background: #667eea;
+            color: white;
+        }
+        
         .copy-btn:hover {
             background: #5568d3;
             transform: translateY(-2px);
         }
         
-        .copy-btn:active {
+        .new-citation-btn {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .new-citation-btn:hover {
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+        
+        .copy-btn:active, .new-citation-btn:active {
             transform: translateY(0);
         }
         
@@ -165,12 +281,83 @@
             font-size: 12px;
             margin-top: 10px;
             font-weight: bold;
+            text-align: center;
+        }
+        
+        .history-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border-left: 4px solid #764ba2;
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .history-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .clear-history-btn {
+            padding: 6px 12px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .clear-history-btn:hover {
+            background: #ee5a6f;
+        }
+        
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-family: 'Times New Roman', serif;
+            font-size: 12px;
+            color: #333;
+            line-height: 1.6;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .history-item:hover {
+            background: #e8f0ff;
+            transform: translateX(4px);
+        }
+        
+        .history-empty {
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            padding: 20px;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Citation Machine</h1>
+        <h1>Website Citation Generator</h1>
         <p class="subtitle">Fill in the information below to generate your citation</p>
         
         <div class="format-toggle">
@@ -178,22 +365,31 @@
             <button class="format-btn" onclick="setFormat('mla')">MLA 9th Edition</button>
         </div>
         
-        <div class="input-group">
-            <label for="authorLast">Author Last Name</label>
-            <input type="text" id="authorLast" placeholder="Last Name" oninput="generateCitation()">
-            <div class="helper-text">Leave blank if no author</div>
+        <div id="authorsContainer">
+            <!-- Author sections will be added here dynamically -->
         </div>
         
-        <div class="input-group">
-            <label for="authorFirst">Author First Name</label>
-            <input type="text" id="authorFirst" placeholder="First Name" oninput="generateCitation()">
-        </div>
+        <button class="add-author-btn" onclick="addAuthor()">➕ Add Another Author</button>
         
         <div class="input-group">
             <label>Publication Date</label>
             <div class="date-group">
-                <input type="text" id="year" placeholder="Year" oninput="generateCitation()">
-                <input type="text" id="month" placeholder="Month" oninput="generateCitation()">
+                <input type="text" id="year" placeholder="Year (YYYY)" oninput="generateCitation()">
+                <select id="month" onchange="generateCitation()">
+                    <option value="">Month</option>
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
                 <input type="text" id="day" placeholder="Day" oninput="generateCitation()">
             </div>
             <div class="helper-text">Leave blank if no date available (will use "n.d.")</div>
@@ -218,8 +414,22 @@
         <div class="input-group" id="accessDateGroup" style="display: none;">
             <label>Access Date (MLA only)</label>
             <div class="date-group">
-                <input type="text" id="accessYear" placeholder="Year" oninput="generateCitation()">
-                <input type="text" id="accessMonth" placeholder="Month" oninput="generateCitation()">
+                <input type="text" id="accessYear" placeholder="Year (YYYY)" oninput="generateCitation()">
+                <select id="accessMonth" onchange="generateCitation()">
+                    <option value="">Month</option>
+                    <option value="Jan.">Jan.</option>
+                    <option value="Feb.">Feb.</option>
+                    <option value="Mar.">Mar.</option>
+                    <option value="Apr.">Apr.</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="Aug.">Aug.</option>
+                    <option value="Sept.">Sept.</option>
+                    <option value="Oct.">Oct.</option>
+                    <option value="Nov.">Nov.</option>
+                    <option value="Dec.">Dec.</option>
+                </select>
                 <input type="text" id="accessDay" placeholder="Day" oninput="generateCitation()">
             </div>
         </div>
@@ -227,13 +437,116 @@
         <div class="citation-output">
             <div class="citation-label" id="formatLabel">APA 7th Edition Citation</div>
             <div class="citation-text" id="citationText">Fill in the fields above to generate your citation</div>
-            <button class="copy-btn" onclick="copyCitation()">Copy Citation</button>
+            
+            <div class="intext-section" id="intextSection" style="display: none;">
+                <div class="intext-label">In-Text Citation Examples</div>
+                <div class="intext-examples" id="intextExamples"></div>
+            </div>
+            
+            <div class="button-group">
+                <button class="copy-btn" onclick="copyCitation()">Copy Citation</button>
+                <button class="new-citation-btn" onclick="newCitation()">New Citation</button>
+            </div>
             <div class="success-msg" id="successMsg">✓ Copied to clipboard!</div>
+        </div>
+        
+        <div class="history-section" id="historySection" style="display: none;">
+            <div class="history-header">
+                <div class="history-label">This Session's Citations</div>
+                <button class="clear-history-btn" onclick="clearHistory()">Clear All</button>
+            </div>
+            <div class="history-list" id="historyList"></div>
         </div>
     </div>
 
     <script>
         let currentFormat = 'apa';
+        let authorCount = 0;
+        let citationHistory = [];
+        
+        // Initialize with one author on load
+        window.onload = function() {
+            addAuthor();
+        };
+        
+        function addAuthor() {
+            authorCount++;
+            const authorsContainer = document.getElementById('authorsContainer');
+            
+            const authorSection = document.createElement('div');
+            authorSection.className = 'author-section';
+            authorSection.id = 'author-' + authorCount;
+            
+            authorSection.innerHTML = `
+                <div class="author-header">
+                    <span class="author-number">Author ${authorCount}</span>
+                    ${authorCount > 1 ? '<button class="remove-author-btn" onclick="removeAuthor(' + authorCount + ')">Remove</button>' : ''}
+                </div>
+                <div class="author-fields">
+                    <div>
+                        <input type="text" id="authorLast${authorCount}" placeholder="Last Name" oninput="generateCitation()">
+                    </div>
+                    <div>
+                        <input type="text" id="authorFirst${authorCount}" placeholder="First Name" oninput="generateCitation()">
+                    </div>
+                </div>
+                ${authorCount === 1 ? '<div class="helper-text" style="margin-top: 8px;">Leave blank if no author</div>' : ''}
+            `;
+            
+            authorsContainer.appendChild(authorSection);
+            generateCitation();
+        }
+        
+        function removeAuthor(id) {
+            const authorSection = document.getElementById('author-' + id);
+            if (authorSection) {
+                authorSection.remove();
+                renumberAuthors();
+                generateCitation();
+            }
+        }
+        
+        function renumberAuthors() {
+            const authorSections = document.querySelectorAll('.author-section');
+            authorCount = 0;
+            authorSections.forEach((section, index) => {
+                authorCount++;
+                section.id = 'author-' + authorCount;
+                const numberSpan = section.querySelector('.author-number');
+                if (numberSpan) {
+                    numberSpan.textContent = 'Author ' + authorCount;
+                }
+                
+                // Update input IDs
+                const inputs = section.querySelectorAll('input');
+                inputs[0].id = 'authorLast' + authorCount;
+                inputs[1].id = 'authorFirst' + authorCount;
+                
+                // Update remove button
+                const removeBtn = section.querySelector('.remove-author-btn');
+                if (removeBtn) {
+                    removeBtn.setAttribute('onclick', 'removeAuthor(' + authorCount + ')');
+                }
+            });
+        }
+        
+        function getAuthors() {
+            const authors = [];
+            for (let i = 1; i <= authorCount; i++) {
+                const lastInput = document.getElementById('authorLast' + i);
+                const firstInput = document.getElementById('authorFirst' + i);
+                
+                if (lastInput && firstInput) {
+                    const last = lastInput.value.trim();
+                    const first = firstInput.value.trim();
+                    
+                    if (last) {
+                        authors.push({ last, first });
+                    }
+                }
+            }
+            return authors;
+        }
         
         function setFormat(format) {
             currentFormat = format;
@@ -252,10 +565,9 @@
         }
         
         function generateCitation() {
-            const authorLast = document.getElementById('authorLast').value.trim();
-            const authorFirst = document.getElementById('authorFirst').value.trim();
+            const authors = getAuthors();
             const year = document.getElementById('year').value.trim();
-            const month = document.getElementById('month').value.trim();
+            const month = document.getElementById('month').value;
             const day = document.getElementById('day').value.trim();
             const title = document.getElementById('title').value.trim();
             const website = document.getElementById('website').value.trim();
@@ -263,31 +575,79 @@
             
             if (!title) {
                 document.getElementById('citationText').textContent = 'Fill in the fields above to generate your citation';
+                document.getElementById('intextSection').style.display = 'none';
                 return;
             }
             
             let citation = '';
+            let intextCitations = [];
             
             if (currentFormat === 'apa') {
-                citation = generateAPA(authorLast, authorFirst, year, month, day, title, website, url);
+                citation = generateAPA(authors, year, month, day, title, website, url);
+                intextCitations = generateAPAIntext(authors, year);
             } else {
                 const accessYear = document.getElementById('accessYear').value.trim();
-                const accessMonth = document.getElementById('accessMonth').value.trim();
+                const accessMonth = document.getElementById('accessMonth').value;
                 const accessDay = document.getElementById('accessDay').value.trim();
-                citation = generateMLA(authorLast, authorFirst, year, month, day, title, website, url, accessYear, accessMonth, accessDay);
+                citation = generateMLA(authors, year, month, day, title, website, url, accessYear, accessMonth, accessDay);
+                intextCitations = generateMLAIntext(authors);
             }
             
             document.getElementById('citationText').textContent = citation;
+            
+            // Show in-text citations
+            if (intextCitations.length > 0) {
+                document.getElementById('intextSection').style.display = 'block';
+                const intextHTML = intextCitations.map(cite => 
+                    `<div class="intext-example">${cite}</div>`
+                ).join('');
+                document.getElementById('intextExamples').innerHTML = intextHTML;
+            } else {
+                document.getElementById('intextSection').style.display = 'none';
+            }
         }
         
-        function generateAPA(authorLast, authorFirst, year, month, day, title, website, url) {
+        function generateAPA(authors, year, month, day, title, website, url) {
             let citation = '';
             
-            // Author
-            if (authorLast) {
-                citation += authorLast;
-                if (authorFirst) {
-                    citation += ', ' + authorFirst.charAt(0) + '.';
+            // Authors
+            if (authors.length > 0) {
+                if (authors.length === 1) {
+                    citation += authors[0].last;
+                    if (authors[0].first) {
+                        citation += ', ' + authors[0].first.charAt(0) + '.';
+                    }
+                } else if (authors.length === 2) {
+                    citation += authors[0].last;
+                    if (authors[0].first) {
+                        citation += ', ' + authors[0].first.charAt(0) + '.';
+                    }
+                    citation += ', & ' + authors[1].last;
+                    if (authors[1].first) {
+                        citation += ', ' + authors[1].first.charAt(0) + '.';
+                    }
+                } else if (authors.length <= 20) {
+                    for (let i = 0; i < authors.length; i++) {
+                        if (i > 0) citation += ', ';
+                        if (i === authors.length - 1) citation += '& ';
+                        citation += authors[i].last;
+                        if (authors[i].first) {
+                            citation += ', ' + authors[i].first.charAt(0) + '.';
+                        }
+                    }
+                } else {
+                    // More than 20 authors
+                    for (let i = 0; i < 19; i++) {
+                        if (i > 0) citation += ', ';
+                        citation += authors[i].last;
+                        if (authors[i].first) {
+                            citation += ', ' + authors[i].first.charAt(0) + '.';
+                        }
+                    }
+                    citation += ', . . . ' + authors[authors.length - 1].last;
+                    if (authors[authors.length - 1].first) {
+                        citation += ', ' + authors[authors.length - 1].first.charAt(0) + '.';
+                    }
                 }
                 citation += ' ';
             }
@@ -307,11 +667,11 @@
             }
             citation += '). ';
             
-            // Title (italicized in display)
-            citation += title.charAt(0).toUpperCase() + title.slice(1).toLowerCase() + '. ';
+            // Title
+            citation += title.charAt(0).toUpperCase() + title.slice(1) + '. ';
             
             // Website name
-            if (website && website !== authorLast) {
+            if (website && (!authors.length || website !== authors[0].last)) {
                 citation += website + '. ';
             }
             
@@ -323,14 +683,28 @@
             return citation;
         }
         
-        function generateMLA(authorLast, authorFirst, year, month, day, title, website, url, accessYear, accessMonth, accessDay) {
+        function generateMLA(authors, year, month, day, title, website, url, accessYear, accessMonth, accessDay) {
             let citation = '';
             
-            // Author
-            if (authorLast) {
-                citation += authorLast;
-                if (authorFirst) {
-                    citation += ', ' + authorFirst;
+            // Authors
+            if (authors.length > 0) {
+                if (authors.length === 1) {
+                    citation += authors[0].last;
+                    if (authors[0].first) {
+                        citation += ', ' + authors[0].first;
+                    }
+                } else if (authors.length === 2) {
+                    citation += authors[0].last;
+                    if (authors[0].first) {
+                        citation += ', ' + authors[0].first;
+                    }
+                    citation += ', and ' + authors[1].first + ' ' + authors[1].last;
+                } else {
+                    citation += authors[0].last;
+                    if (authors[0].first) {
+                        citation += ', ' + authors[0].first;
+                    }
+                    citation += ', et al';
                 }
                 citation += '. ';
             }
@@ -365,6 +739,49 @@
             return citation;
         }
         
+        function generateAPAIntext(authors, year) {
+            if (authors.length === 0) return [];
+            
+            const yearText = year || 'n.d.';
+            let narrativeForm = '';
+            let parentheticalForm = '';
+            
+            if (authors.length === 1) {
+                narrativeForm = `${authors[0].last} (${yearText})`;
+                parentheticalForm = `(${authors[0].last}, ${yearText})`;
+            } else if (authors.length === 2) {
+                narrativeForm = `${authors[0].last} and ${authors[1].last} (${yearText})`;
+                parentheticalForm = `(${authors[0].last} & ${authors[1].last}, ${yearText})`;
+            } else {
+                narrativeForm = `${authors[0].last} et al. (${yearText})`;
+                parentheticalForm = `(${authors[0].last} et al., ${yearText})`;
+            }
+            
+            return [
+                `Narrative: ${narrativeForm}`,
+                `Parenthetical: ${parentheticalForm}`
+            ];
+        }
+        
+        function generateMLAIntext(authors) {
+            if (authors.length === 0) return [];
+            
+            let citation = '';
+            
+            if (authors.length === 1) {
+                citation = `(${authors[0].last})`;
+            } else if (authors.length === 2) {
+                citation = `(${authors[0].last} and ${authors[1].last})`;
+            } else {
+                citation = `(${authors[0].last} et al.)`;
+            }
+            
+            return [
+                `Basic: ${citation}`,
+                `With page: ${citation.slice(0, -1)} 23)` // Example with page number
+            ];
+        }
+        
         function copyCitation() {
             const citationText = document.getElementById('citationText').textContent;
             navigator.clipboard.writeText(citationText).then(() => {
@@ -374,6 +791,79 @@
                     successMsg.style.display = 'none';
                 }, 2000);
             });
+        }
+        
+        function newCitation() {
+            // Save current citation to history before clearing
+            const currentCitation = document.getElementById('citationText').textContent;
+            if (currentCitation && currentCitation !== 'Fill in the fields above to generate your citation') {
+                saveCitationToHistory(currentCitation);
+            }
+            
+            // Clear all author fields
+            for (let i = 1; i <= authorCount; i++) {
+                const lastInput = document.getElementById('authorLast' + i);
+                const firstInput = document.getElementById('authorFirst' + i);
+                if (lastInput) lastInput.value = '';
+                if (firstInput) firstInput.value = '';
+            }
+            
+            // Clear all other fields
+            document.getElementById('year').value = '';
+            document.getElementById('month').value = '';
+            document.getElementById('day').value = '';
+            document.getElementById('title').value = '';
+            document.getElementById('website').value = '';
+            document.getElementById('url').value = '';
+            document.getElementById('accessYear').value = '';
+            document.getElementById('accessMonth').value = '';
+            document.getElementById('accessDay').value = '';
+            
+            // Reset to single author
+            const authorsContainer = document.getElementById('authorsContainer');
+            authorsContainer.innerHTML = '';
+            authorCount = 0;
+            addAuthor();
+            
+            generateCitation();
+        }
+        
+        function saveCitationToHistory(citation) {
+            citationHistory.unshift(citation);
+            updateHistoryDisplay();
+        }
+        
+        function updateHistoryDisplay() {
+            const historySection = document.getElementById('historySection');
+            const historyList = document.getElementById('historyList');
+            
+            if (citationHistory.length === 0) {
+                historySection.style.display = 'none';
+                return;
+            }
+            
+            historySection.style.display = 'block';
+            historyList.innerHTML = citationHistory.map((citation, index) => 
+                `<div class="history-item" onclick="copyCitationFromHistory(${index})">${citation}</div>`
+            ).join('');
+        }
+        
+        function copyCitationFromHistory(index) {
+            const citation = citationHistory[index];
+            navigator.clipboard.writeText(citation).then(() => {
+                const successMsg = document.getElementById('successMsg');
+                successMsg.style.display = 'block';
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 2000);
+            });
+        }
+        
+        function clearHistory() {
+            if (confirm('Clear all citations from this session?')) {
+                citationHistory = [];
+                updateHistoryDisplay();
+            }
         }
     </script>
 </body>
