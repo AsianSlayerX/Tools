@@ -95,9 +95,18 @@
             font-family: 'Georgia', serif;
         }
         
+        input::placeholder {
+            color: #a9a9a9;
+            opacity: 1;
+        }
+        
         select {
             cursor: pointer;
             background: white;
+        }
+        
+        select option {
+            color: #333;
         }
         
         input:focus, select:focus {
@@ -127,9 +136,9 @@
         
         .remove-author-btn {
             padding: 6px 12px;
-            background: #ff4757;
-            color: white;
-            border: none;
+            background: white;
+            color: #ff4757;
+            border: 2px solid #ff4757;
             border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
@@ -138,7 +147,8 @@
         }
         
         .remove-author-btn:hover {
-            background: #ee5a6f;
+            background: #ff4757;
+            color: white;
         }
         
         .author-fields {
@@ -299,18 +309,20 @@
         
         .clear-history-btn {
             padding: 6px 12px;
-            background: #ff4757;
-            color: white;
-            border: none;
+            background: white;
+            color: #ff4757;
+            border: 2px solid #ff4757;
             border-radius: 4px;
             cursor: pointer;
             font-size: 11px;
             font-weight: bold;
             transition: all 0.3s;
+            white-space: nowrap;
         }
         
         .clear-history-btn:hover {
-            background: #ee5a6f;
+            background: #ff4757;
+            color: white;
         }
         
         .history-list {
@@ -369,18 +381,20 @@
         
         .clear-saved-btn {
             padding: 6px 12px;
-            background: #ff4757;
-            color: white;
-            border: none;
+            background: white;
+            color: #ff4757;
+            border: 2px solid #ff4757;
             border-radius: 4px;
             cursor: pointer;
             font-size: 11px;
             font-weight: bold;
             transition: all 0.3s;
+            white-space: nowrap;
         }
         
         .clear-saved-btn:hover {
-            background: #ee5a6f;
+            background: #ff4757;
+            color: white;
         }
         
         .saved-list {
@@ -429,7 +443,6 @@
         .copy-saved-btn, .delete-saved-btn {
             flex: 1;
             padding: 6px 12px;
-            border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 11px;
@@ -438,21 +451,25 @@
         }
         
         .copy-saved-btn {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .copy-saved-btn:hover {
             background: #667eea;
             color: white;
         }
         
-        .copy-saved-btn:hover {
-            background: #5568d3;
-        }
-        
         .delete-saved-btn {
-            background: #ff4757;
-            color: white;
+            background: white;
+            color: #ff4757;
+            border: 2px solid #ff4757;
         }
         
         .delete-saved-btn:hover {
-            background: #ee5a6f;
+            background: #ff4757;
+            color: white;
         }
         
         .saved-empty {
@@ -484,7 +501,7 @@
             <label>Publication Date</label>
             <div class="date-group">
                 <input type="text" id="year" placeholder="Year (YYYY)" oninput="generateCitation()">
-                <select id="month" onchange="generateCitation()">
+                <select id="month" onchange="updateSelectColor(this); generateCitation()">
                     <option value="">Month</option>
                     <option value="January">January</option>
                     <option value="February">February</option>
@@ -522,7 +539,7 @@
             <label>Access Date (MLA only)</label>
             <div class="date-group">
                 <input type="text" id="accessYear" placeholder="Year (YYYY)" oninput="generateCitation()">
-                <select id="accessMonth" onchange="generateCitation()">
+                <select id="accessMonth" onchange="updateSelectColor(this); generateCitation()">
                     <option value="">Month</option>
                     <option value="Jan.">Jan.</option>
                     <option value="Feb.">Feb.</option>
@@ -585,7 +602,18 @@
         window.onload = function() {
             addAuthor();
             loadSavedCitations();
+            // Initialize select colors
+            updateSelectColor(document.getElementById('month'));
+            updateSelectColor(document.getElementById('accessMonth'));
         };
+        
+        function updateSelectColor(selectElement) {
+            if (selectElement.value === '') {
+                selectElement.style.color = '#a9a9a9';
+            } else {
+                selectElement.style.color = '#333';
+            }
+        }
         
         function loadSavedCitations() {
             const saved = localStorage.getItem('savedCitations');
@@ -1079,6 +1107,10 @@
             document.getElementById('accessYear').value = '';
             document.getElementById('accessMonth').value = '';
             document.getElementById('accessDay').value = '';
+            
+            // Reset select colors
+            updateSelectColor(document.getElementById('month'));
+            updateSelectColor(document.getElementById('accessMonth'));
             
             // Reset to single author
             const authorsContainer = document.getElementById('authorsContainer');
