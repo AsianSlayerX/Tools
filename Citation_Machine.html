@@ -34,12 +34,14 @@
             color: #333;
             margin-bottom: 10px;
             font-size: 28px;
+            text-align: center;
         }
         
         .subtitle {
             color: #666;
             margin-bottom: 30px;
             font-size: 14px;
+            text-align: center;
         }
         
         .format-toggle {
@@ -239,39 +241,27 @@
             margin-top: 15px;
         }
         
-        .copy-btn, .new-citation-btn {
+        .copy-btn, .new-citation-btn, .save-btn {
             flex: 1;
-            padding: 10px 20px;
-            border: none;
+            padding: 12px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
             border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
+            cursor: pointer;
             transition: all 0.3s;
         }
         
-        .copy-btn {
+        .copy-btn:hover, .save-btn:hover, .new-citation-btn:hover {
             background: #667eea;
             color: white;
-        }
-        
-        .copy-btn:hover {
-            background: #5568d3;
             transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
         }
         
-        .new-citation-btn {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-        
-        .new-citation-btn:hover {
-            background: #f0f4ff;
-            transform: translateY(-2px);
-        }
-        
-        .copy-btn:active, .new-citation-btn:active {
+        .copy-btn:active, .new-citation-btn:active, .save-btn:active {
             transform: translateY(0);
         }
         
@@ -353,6 +343,125 @@
             padding: 20px;
             font-style: italic;
         }
+        
+        .saved-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0fff4;
+            border-radius: 6px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .saved-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .saved-label {
+            font-size: 12px;
+            color: #2d5016;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .clear-saved-btn {
+            padding: 6px 12px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .clear-saved-btn:hover {
+            background: #ee5a6f;
+        }
+        
+        .saved-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .saved-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border: 1px solid #c8e6c9;
+            transition: all 0.2s;
+        }
+        
+        .saved-item:hover {
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+        }
+        
+        .saved-citation {
+            font-family: 'Times New Roman', serif;
+            font-size: 13px;
+            color: #333;
+            line-height: 1.8;
+            margin-bottom: 10px;
+            text-indent: -2em;
+            padding-left: 2em;
+        }
+        
+        .saved-intext {
+            background: #f9f9f9;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 10px;
+            font-family: 'Times New Roman', serif;
+        }
+        
+        .saved-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .copy-saved-btn, .delete-saved-btn {
+            flex: 1;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .copy-saved-btn {
+            background: #667eea;
+            color: white;
+        }
+        
+        .copy-saved-btn:hover {
+            background: #5568d3;
+        }
+        
+        .delete-saved-btn {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .delete-saved-btn:hover {
+            background: #ee5a6f;
+        }
+        
+        .saved-empty {
+            text-align: center;
+            color: #81c784;
+            font-size: 13px;
+            padding: 20px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -369,7 +478,7 @@
             <!-- Author sections will be added here dynamically -->
         </div>
         
-        <button class="add-author-btn" onclick="addAuthor()">➕ Add Another Author</button>
+        <button class="add-author-btn" onclick="addAuthor()">+ Add Another Author</button>
         
         <div class="input-group">
             <label>Publication Date</label>
@@ -392,18 +501,16 @@
                 </select>
                 <input type="text" id="day" placeholder="Day" oninput="generateCitation()">
             </div>
-            <div class="helper-text">Leave blank if no date available (will use "n.d.")</div>
         </div>
         
         <div class="input-group">
-            <label for="title">Title of Article/Website</label>
-            <input type="text" id="title" placeholder="Enter here" oninput="generateCitation()">
+            <label for="title">Title of Webpage</label>
+            <input type="text" id="title" placeholder="Enter the webpage title here" oninput="autoCapitalizeTitle()">
         </div>
         
         <div class="input-group">
-            <label for="website">Publisher Name</label>
-            <input type="text" id="website" placeholder="Enter here" oninput="generateCitation()">
-            <div class="helper-text">Leave blank if same as author</div>
+            <label for="website">Website Name</label>
+            <input type="text" id="website" placeholder="Name of the website" oninput="generateCitation()">
         </div>
         
         <div class="input-group">
@@ -444,8 +551,9 @@
             </div>
             
             <div class="button-group">
-                <button class="copy-btn" onclick="copyCitation()">Copy Citation</button>
-                <button class="new-citation-btn" onclick="newCitation()">New Citation</button>
+                <button class="copy-btn" onclick="copyCitation()">Copy</button>
+                <button class="save-btn" onclick="saveCitation()">Save</button>
+                <button class="new-citation-btn" onclick="newCitation()">New</button>
             </div>
             <div class="success-msg" id="successMsg">✓ Copied to clipboard!</div>
         </div>
@@ -457,17 +565,78 @@
             </div>
             <div class="history-list" id="historyList"></div>
         </div>
+        
+        <div class="saved-section" id="savedSection" style="display: none;">
+            <div class="saved-header">
+                <div class="saved-label">Saved Citation Library (Persistent)</div>
+                <button class="clear-saved-btn" onclick="clearSavedCitations()">Clear All</button>
+            </div>
+            <div class="saved-list" id="savedList"></div>
+        </div>
     </div>
 
     <script>
         let currentFormat = 'apa';
         let authorCount = 0;
         let citationHistory = [];
+        let savedCitations = [];
         
-        // Initialize with one author on load
+        // Load saved citations from localStorage on page load
         window.onload = function() {
             addAuthor();
+            loadSavedCitations();
         };
+        
+        function loadSavedCitations() {
+            const saved = localStorage.getItem('savedCitations');
+            if (saved) {
+                savedCitations = JSON.parse(saved);
+                updateSavedDisplay();
+            }
+        }
+        
+        function saveCitationsToStorage() {
+            localStorage.setItem('savedCitations', JSON.stringify(savedCitations));
+        }
+        
+        // Auto Title Case Function (runs on input)
+        function autoCapitalizeTitle() {
+            const titleInput = document.getElementById('title');
+            const cursorPosition = titleInput.selectionStart;
+            const title = titleInput.value;
+            
+            if (!title) {
+                generateCitation();
+                return;
+            }
+            
+            // Words that should NOT be capitalized (unless first or last word)
+            const lowercaseWords = [
+                'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'in', 
+                'into', 'nor', 'of', 'on', 'onto', 'or', 'the', 'to', 'with', 'yet'
+            ];
+            
+            const words = title.toLowerCase().split(' ');
+            
+            const titleCased = words.map((word, index) => {
+                // Always capitalize first and last word
+                if (index === 0 || index === words.length - 1) {
+                    return word.charAt(0).toUpperCase() + word.slice(1);
+                }
+                
+                // Check if word should stay lowercase
+                if (lowercaseWords.includes(word)) {
+                    return word;
+                }
+                
+                // Capitalize the word
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
+            
+            titleInput.value = titleCased;
+            titleInput.setSelectionRange(cursorPosition, cursorPosition);
+            generateCitation();
+        }
         
         function addAuthor() {
             authorCount++;
@@ -490,7 +659,6 @@
                         <input type="text" id="authorFirst${authorCount}" placeholder="First Name" oninput="generateCitation()">
                     </div>
                 </div>
-                ${authorCount === 1 ? '<div class="helper-text" style="margin-top: 8px;">Leave blank if no author</div>' : ''}
             `;
             
             authorsContainer.appendChild(authorSection);
@@ -668,7 +836,7 @@
             citation += '). ';
             
             // Title
-            citation += title.charAt(0).toUpperCase() + title.slice(1) + '. ';
+            citation += title + '. ';
             
             // Website name
             if (website && (!authors.length || website !== authors[0].last)) {
@@ -710,7 +878,7 @@
             }
             
             // Title (in quotes)
-            citation += '"' + title.charAt(0).toUpperCase() + title.slice(1) + '." ';
+            citation += '"' + title + '." ';
             
             // Website name (italicized)
             if (website) {
@@ -785,16 +953,109 @@
         function copyCitation() {
             const citationText = document.getElementById('citationText').textContent;
             navigator.clipboard.writeText(citationText).then(() => {
-                const successMsg = document.getElementById('successMsg');
-                successMsg.style.display = 'block';
-                setTimeout(() => {
-                    successMsg.style.display = 'none';
-                }, 2000);
+                showSuccessMessage('✓ Copied to clipboard!');
             });
         }
         
+        function showSuccessMessage(message) {
+            const successMsg = document.getElementById('successMsg');
+            successMsg.textContent = message;
+            successMsg.style.display = 'block';
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 2000);
+        }
+        
+        function saveCitation() {
+            const citationText = document.getElementById('citationText').textContent;
+            
+            if (!citationText || citationText === 'Fill in the fields above to generate your citation') {
+                alert('Please generate a citation first!');
+                return;
+            }
+            
+            // Get in-text citation if available
+            const intextExamples = document.getElementById('intextExamples').innerHTML;
+            
+            // Get the first author's last name for sorting
+            const authors = getAuthors();
+            const sortKey = authors.length > 0 ? authors[0].last.toLowerCase() : citationText.toLowerCase();
+            
+            // Create citation object
+            const citationObj = {
+                citation: citationText,
+                intext: intextExamples,
+                format: currentFormat,
+                sortKey: sortKey,
+                timestamp: Date.now()
+            };
+            
+            // Add to saved citations
+            savedCitations.push(citationObj);
+            
+            // Sort alphabetically by sortKey
+            savedCitations.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+            
+            // Save to localStorage
+            saveCitationsToStorage();
+            
+            // Update display
+            updateSavedDisplay();
+            
+            // Show success message
+            showSuccessMessage('✓ Citation saved to library!');
+            
+            // Clear the form
+            newCitation();
+        }
+        
+        function updateSavedDisplay() {
+            const savedSection = document.getElementById('savedSection');
+            const savedList = document.getElementById('savedList');
+            
+            if (savedCitations.length === 0) {
+                savedSection.style.display = 'none';
+                return;
+            }
+            
+            savedSection.style.display = 'block';
+            savedList.innerHTML = savedCitations.map((item, index) => `
+                <div class="saved-item">
+                    <div class="saved-citation">${item.citation}</div>
+                    ${item.intext ? '<div class="saved-intext">' + item.intext + '</div>' : ''}
+                    <div class="saved-actions">
+                        <button class="copy-saved-btn" onclick="copySavedCitation(${index})">Copy</button>
+                        <button class="delete-saved-btn" onclick="deleteSavedCitation(${index})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function copySavedCitation(index) {
+            const citation = savedCitations[index].citation;
+            navigator.clipboard.writeText(citation).then(() => {
+                showSuccessMessage('✓ Copied from library!');
+            });
+        }
+        
+        function deleteSavedCitation(index) {
+            if (confirm('Delete this citation from your library?')) {
+                savedCitations.splice(index, 1);
+                saveCitationsToStorage();
+                updateSavedDisplay();
+            }
+        }
+        
+        function clearSavedCitations() {
+            if (confirm('Clear all saved citations? This cannot be undone.')) {
+                savedCitations = [];
+                saveCitationsToStorage();
+                updateSavedDisplay();
+            }
+        }
+        
         function newCitation() {
-            // Save current citation to history before clearing
+            // Save current citation to session history before clearing
             const currentCitation = document.getElementById('citationText').textContent;
             if (currentCitation && currentCitation !== 'Fill in the fields above to generate your citation') {
                 saveCitationToHistory(currentCitation);
@@ -851,11 +1112,7 @@
         function copyCitationFromHistory(index) {
             const citation = citationHistory[index];
             navigator.clipboard.writeText(citation).then(() => {
-                const successMsg = document.getElementById('successMsg');
-                successMsg.style.display = 'block';
-                setTimeout(() => {
-                    successMsg.style.display = 'none';
-                }, 2000);
+                showSuccessMessage('✓ Copied from session history!');
             });
         }
         
