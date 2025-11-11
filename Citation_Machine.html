@@ -681,10 +681,10 @@
                 </div>
                 <div class="author-fields">
                     <div>
-                        <input type="text" id="authorLast${authorCount}" placeholder="Last Name" oninput="generateCitation()">
+                        <input type="text" id="authorFirst${authorCount}" placeholder="First Name" oninput="generateCitation()">
                     </div>
                     <div>
-                        <input type="text" id="authorFirst${authorCount}" placeholder="First Name" oninput="generateCitation()">
+                        <input type="text" id="authorLast${authorCount}" placeholder="Last Name" oninput="generateCitation()">
                     </div>
                 </div>
             `;
@@ -715,8 +715,8 @@
                 
                 // Update input IDs
                 const inputs = section.querySelectorAll('input');
-                inputs[0].id = 'authorLast' + authorCount;
-                inputs[1].id = 'authorFirst' + authorCount;
+                inputs[0].id = 'authorFirst' + authorCount;
+                inputs[1].id = 'authorLast' + authorCount;
                 
                 // Update remove button
                 const removeBtn = section.querySelector('.remove-author-btn');
@@ -941,21 +941,26 @@
             const yearText = year || 'n.d.';
             let narrativeForm = '';
             let parentheticalForm = '';
+            let directQuoteForm = '';
             
             if (authors.length === 1) {
                 narrativeForm = `${authors[0].last} (${yearText})`;
                 parentheticalForm = `(${authors[0].last}, ${yearText})`;
+                directQuoteForm = `(${authors[0].last}, ${yearText}, p. 23)`;
             } else if (authors.length === 2) {
                 narrativeForm = `${authors[0].last} and ${authors[1].last} (${yearText})`;
                 parentheticalForm = `(${authors[0].last} & ${authors[1].last}, ${yearText})`;
+                directQuoteForm = `(${authors[0].last} & ${authors[1].last}, ${yearText}, p. 23)`;
             } else {
                 narrativeForm = `${authors[0].last} et al. (${yearText})`;
                 parentheticalForm = `(${authors[0].last} et al., ${yearText})`;
+                directQuoteForm = `(${authors[0].last} et al., ${yearText}, p. 23)`;
             }
             
             return [
                 `Narrative: ${narrativeForm}`,
-                `Parenthetical: ${parentheticalForm}`
+                `Parenthetical: ${parentheticalForm}`,
+                `Direct Quote: ${directQuoteForm}`
             ];
         }
         
