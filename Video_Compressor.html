@@ -249,21 +249,29 @@
             <p><strong>Compressed size:</strong> <span id="compressedSize"></span></p>
             <p><strong>Size reduction:</strong> <span id="reduction"></span></p>
             <p><strong>Output format:</strong> <span id="outputFormat"></span></p>
+            <p><strong>Browser:</strong> <span id="browserInfo"></span></p>
+            <p id="shareSupport" style="font-size: 13px; color: #666; margin-top: 5px;"></p>
             
             <video id="resultVideo" controls style="width: 100%; margin: 15px 0; border-radius: 6px; display: none;"></video>
             
-            <button class="download-btn" onclick="downloadVideo()">Download Compressed Video</button>
-            <button class="download-btn" onclick="openInNewTab()" style="margin-top: 10px;">Open in New Tab (Mobile)</button>
+            <button class="download-btn" onclick="downloadVideo()">Download (Desktop)</button>
+            <button class="download-btn" onclick="openInNewTab()" style="margin-top: 10px;">Save to Files (Mobile/iOS)</button>
         </div>
         
         <div class="info">
-            <h4>Note:</h4>
+            <h4>How to Save on Mobile/iOS:</h4>
             <ul>
-                <li>MP4 output supported in Safari and some mobile browsers</li>
-                <li>Other browsers will output WebM format (widely compatible)</li>
+                <li><strong>Step 1:</strong> After compression completes, click "Save to Files (Mobile/iOS)"</li>
+                <li><strong>Step 2:</strong> A share menu will appear - choose "Save to Files" or "Save Video"</li>
+                <li><strong>Alternative:</strong> If share menu doesn't appear, video will open in new tab - long-press it and select "Save Video"</li>
+            </ul>
+            <h4 style="margin-top: 15px;">Technical Notes:</h4>
+            <ul>
+                <li><strong>Output format:</strong> MP4 only</li>
+                <li><strong>Required browser:</strong> Safari (iOS/macOS) - other browsers don't support MP4 encoding</li>
+                <li><strong>Accepts:</strong> MP4 and MOV video files as input</li>
                 <li>Processing happens in your browser - no upload needed</li>
                 <li>Large videos may take a few minutes to process</li>
-                <li><strong>Mobile users:</strong> Use "Open in New Tab" button, then long-press the video to save</li>
             </ul>
         </div>
     </div>
@@ -275,8 +283,7 @@
         let inputFile = null;
         let outputBlob = null;
         let inputSize = 0;
-        let outputFormat = 'webm';
-        let fileExtension = 'webm';
+        let fileExtension = 'mp4';
         
         const resolutionMap = {
             '480': { width: 854, height: 480 },
@@ -310,32 +317,25 @@
             
             for (var i = 0; i < mp4Types.length; i++) {
                 if (MediaRecorder.isTypeSupported(mp4Types[i])) {
-                    outputFormat = 'mp4';
                     fileExtension = 'mp4';
                     return mp4Types[i];
                 }
             }
             
-            if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
-                outputFormat = 'webm';
-                fileExtension = 'webm';
-                return 'video/webm;codecs=vp9';
-            }
-            
-            if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
-                outputFormat = 'webm';
-                fileExtension = 'webm';
-                return 'video/webm;codecs=vp8';
-            }
-            
-            outputFormat = 'webm';
-            fileExtension = 'webm';
-            return 'video/webm';
+            // MP4 not supported - return null
+            return null;
         }
         
         function compressVideo() {
             if (!inputFile) {
                 alert('Please select a video file first');
+                return;
+            }
+            
+            // Check MP4 support first
+            var mimeType = detectBestFormat();
+            if (!mimeType) {
+                showStatus('MP4 encoding is not supported in this browser. Please use Safari (iOS/macOS) for MP4 output.', 'error');
                 return;
             }
             
@@ -360,7 +360,6 @@
                     
                     var stream = canvas.captureStream(30);
                     var bitrate = parseInt(document.getElementById('quality').value);
-                    var mimeType = detectBestFormat();
                     
                     console.log('Using format:', mimeType);
                     
@@ -378,8 +377,7 @@
                     };
                     
                     mediaRecorder.onstop = function() {
-                        var type = outputFormat === 'mp4' ? 'video/mp4' : 'video/webm';
-                        outputBlob = new Blob(chunks, { type: type });
+                        outputBlob = new Blob(chunks, { type: 'video/mp4' });
                         showResult();
                     };
                     
@@ -432,7 +430,19 @@
             
             var reduction = ((1 - outputBlob.size / inputSize) * 100).toFixed(1);
             document.getElementById('reduction').textContent = reduction + '%';
-            document.getElementById('outputFormat').textContent = outputFormat.toUpperCase();
+            document.getElementById('outputFormat').textContent = 'MP4';
+            
+            // Browser info
+            var browser = 'Unknown';
+            var ua = navigator.userAgent;
+            if (ua.indexOf('Safari') > -1 && ua.indexOf('Chrome') === -1) browser = 'Safari';
+            else if (ua.indexOf('Chrome') > -1) browser = 'Chrome';
+            else if (ua.indexOf('Firefox') > -1) browser = 'Firefox';
+            document.getElementById('browserInfo').textContent = browser + ' (iOS: ' + (/iPad|iPhone|iPod/.test(ua) ? 'Yes' : 'No') + ')';
+            
+            // Share support info
+            var shareSupported = navigator.share && navigator.canShare ? 'Yes' : 'No';
+            document.getElementById('shareSupport').textContent = 'Share API supported: ' + shareSupported;
             
             // Show video preview
             var resultVideo = document.getElementById('resultVideo');
@@ -443,6 +453,28 @@
         function openInNewTab() {
             if (!outputBlob) return;
             
+            // Try native share API first (works great on iOS)
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [outputBlob] })) {
+                var originalName = inputFile.name.replace(/\.[^/.]+$/, '');
+                var fileName = 'compressed_' + originalName + '.' + fileExtension;
+                var file = new File([outputBlob], fileName, { type: outputBlob.type });
+                
+                navigator.share({
+                    files: [file],
+                    title: 'Compressed Video',
+                    text: 'Compressed video file'
+                }).then(function() {
+                    showStatus('Video shared successfully! Choose where to save it.', 'success');
+                }).catch(function(err) {
+                    console.error('Share failed:', err);
+                    fallbackOpen();
+                });
+            } else {
+                fallbackOpen();
+            }
+        }
+        
+        function fallbackOpen() {
             var url = URL.createObjectURL(outputBlob);
             var newWindow = window.open(url, '_blank');
             
@@ -490,6 +522,19 @@
         }
         
         document.getElementById('compressBtn').disabled = true;
+        
+        // Check browser compatibility on load
+        window.addEventListener('load', function() {
+            var ua = navigator.userAgent;
+            var isSafari = ua.indexOf('Safari') > -1 && ua.indexOf('Chrome') === -1;
+            
+            if (!isSafari) {
+                var mimeType = detectBestFormat();
+                if (!mimeType) {
+                    showStatus('⚠️ This browser does not support MP4 encoding. Please use Safari (iOS/macOS) for this tool.', 'error');
+                }
+            }
+        });
     </script>
 </body>
 </html>
