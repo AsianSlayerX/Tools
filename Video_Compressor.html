@@ -152,6 +152,7 @@
             color: #4a7ba7;
             border-color: #4a7ba7;
             margin-top: 15px;
+            width: 100%;
         }
         
         .download-btn:hover {
@@ -248,7 +249,11 @@
             <p><strong>Compressed size:</strong> <span id="compressedSize"></span></p>
             <p><strong>Size reduction:</strong> <span id="reduction"></span></p>
             <p><strong>Output format:</strong> <span id="outputFormat"></span></p>
+            
+            <video id="resultVideo" controls style="width: 100%; margin: 15px 0; border-radius: 6px; display: none;"></video>
+            
             <button class="download-btn" onclick="downloadVideo()">Download Compressed Video</button>
+            <button class="download-btn" onclick="openInNewTab()" style="margin-top: 10px;">Open in New Tab (Mobile)</button>
         </div>
         
         <div class="info">
@@ -258,6 +263,7 @@
                 <li>Other browsers will output WebM format (widely compatible)</li>
                 <li>Processing happens in your browser - no upload needed</li>
                 <li>Large videos may take a few minutes to process</li>
+                <li><strong>Mobile users:</strong> Use "Open in New Tab" button, then long-press the video to save</li>
             </ul>
         </div>
     </div>
@@ -427,20 +433,54 @@
             var reduction = ((1 - outputBlob.size / inputSize) * 100).toFixed(1);
             document.getElementById('reduction').textContent = reduction + '%';
             document.getElementById('outputFormat').textContent = outputFormat.toUpperCase();
+            
+            // Show video preview
+            var resultVideo = document.getElementById('resultVideo');
+            resultVideo.src = URL.createObjectURL(outputBlob);
+            resultVideo.style.display = 'block';
+        }
+        
+        function openInNewTab() {
+            if (!outputBlob) return;
+            
+            var url = URL.createObjectURL(outputBlob);
+            var newWindow = window.open(url, '_blank');
+            
+            if (newWindow) {
+                showStatus('Video opened in new tab. Long-press the video to save it to your device.', 'info');
+            } else {
+                showStatus('Please allow pop-ups for this site to open the video.', 'error');
+            }
         }
         
         function downloadVideo() {
             if (!outputBlob) return;
             
+            // Mobile-friendly download approach
             var url = URL.createObjectURL(outputBlob);
+            var originalName = inputFile.name.replace(/\.[^/.]+$/, '');
+            var fileName = 'compressed_' + originalName + '.' + fileExtension;
+            
+            // Try standard download first
             var a = document.createElement('a');
             a.href = url;
-            var originalName = inputFile.name.replace(/\.[^/.]+$/, '');
-            a.download = 'compressed_' + originalName + '.' + fileExtension;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            a.download = fileName;
+            
+            // For mobile browsers that don't support download attribute
+            if (!a.download) {
+                // Open in new window so user can save manually
+                window.open(url, '_blank');
+                showStatus('Video opened in new window. Use your browser\'s save feature to download.', 'info');
+            } else {
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+            
+            // Don't revoke URL immediately on mobile
+            setTimeout(function() {
+                URL.revokeObjectURL(url);
+            }, 5000);
         }
         
         function resetUI() {
